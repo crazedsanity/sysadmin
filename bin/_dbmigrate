@@ -1,0 +1,24 @@
+#!/bin/bash
+
+DB="$1"
+SVR="$2"
+
+if [ -z "$DB" ]; then
+	echo "Usage: $0 dbname [server]";
+	exit 1;
+fi
+if [ -z "$SVR" ]; then
+	SVR="kk07"
+fi;
+
+echo " # ---> IMPORTANT! make sure '${DB}' exists on ${SVR} AND this server!";
+
+CMD="ssh ${SVR} \"mysqldump -u root -R ${DB}\" | mysql -u root ${DB}"
+echo " # ---> going to run the following command:";
+echo " ${CMD}"
+read -p " ## press [enter] to continue...";
+echo " # ---> HERE I GO!"
+
+ssh ${SVR} "mysqldump -u root -R ${DB}" | mysql -u root ${DB}
+
+echo " # ---> Done."
