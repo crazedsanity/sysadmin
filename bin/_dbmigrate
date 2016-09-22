@@ -2,14 +2,19 @@
 
 DB="$1"
 SVR="$2"
-
+USAGE="Usage: $0 dbname [server]"
 if [ -z "$DB" ]; then
-	echo "Usage: $0 dbname [server]";
+	echo $USAGE;
 	exit 1;
 fi
 #if [ -z "$SVR" ]; then
 #	SVR="server.domain.com"
 #fi;
+if [ -z "$SVR" ]; then
+	echo "servername required (you can edit the script to fix this)";
+	echo $USAGE;
+	exit 1;
+fi;
 
 echo " # ---> IMPORTANT! This script will attempt to create the database locally (ignore errors about that)";
 echo "create schema ${DB}" | mysql -u root
