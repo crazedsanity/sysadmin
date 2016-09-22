@@ -7,11 +7,12 @@ if [ -z "$DB" ]; then
 	echo "Usage: $0 dbname [server]";
 	exit 1;
 fi
-if [ -z "$SVR" ]; then
-	SVR="kk07"
-fi;
+#if [ -z "$SVR" ]; then
+#	SVR="server.domain.com"
+#fi;
 
-echo " # ---> IMPORTANT! make sure '${DB}' exists on ${SVR} AND this server!";
+echo " # ---> IMPORTANT! This script will attempt to create the database locally (ignore errors about that)";
+echo "create schema ${DB}" | mysql -u root
 
 CMD="ssh ${SVR} \"mysqldump -u root -R ${DB}\" | mysql -u root ${DB}"
 echo " # ---> going to run the following command:";
