@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DIR="$1"
+if [ -z "$1" ]; then 
+	DIR="/var/www/html"
+fi;
+
+## find all httpd.conf files, parse them for ServerName and ServerAlias (filter out dev sites)
+find $DIR -type f -name "*.conf" -exec grep -e ServerName -e ServerAlias {} + | grep --invert-match "#" | cut --delimiter=":" -f2 | sed -e "s/^ {1,}//" | sed "s/,/\n/"| cut --delimiter=" " -f2 | grep --invert-match -e "\*" -e "\.whatisbold\.com" -e "\.kkbold\.com" | sort | uniq
