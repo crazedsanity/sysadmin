@@ -1,0 +1,21 @@
+#!/bin/bash
+
+SITE="$1"
+USAGE="Usage: $0 www.website.org"
+if [ -z "$SITE" ]; then
+	echo $USAGE;
+	exit 1;
+fi
+
+DOMAIN=`echo "$SITE" | sed -e s/^www\.//`
+echo $DOMAIN
+
+
+wget --recursive --no-clobber \
+     --page-requisites \
+     --html-extension \
+     --convert-links \
+     --restrict-file-names=windows \
+     --domains ${DOMAIN} \
+     --no-parent \
+         ${SITE}
