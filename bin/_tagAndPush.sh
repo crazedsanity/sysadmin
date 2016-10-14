@@ -9,12 +9,13 @@ v=`grep "VERSION:" VERSION | cut -f2 -d " "`
 p=`grep "PROJECT:" VERSION | cut -f2 -d " "`
 #TAG="git tag v$v"
 LASTTAG=`git describe --tags --abbrev=0`
-tmpfile=''
+tmpfile=$(mktemp /tmp/_tagAndPush.XXXXX)
 EXTRALOGCMD=''
 if [ -n "$LASTTAG" ]; then
 	EXTRALOGCMD="${LASTTAG}..HEAD "
-	tmpfile=$(mktemp /tmp/_tagAndPush.XXXXX)
 	git log ${EXTRALOGCMD}--oneline > ${tmpfile}
+else 
+	git log --oneline > ${tmpfile}
 fi
 TAG="git tag v${v} -a -F ${tmpfile}"
 PUSH="git push"
