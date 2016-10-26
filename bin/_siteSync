@@ -1,0 +1,59 @@
+#!/bin/bash
+
+
+
+FOLDER="${1}"
+SVR="${2}"
+BASE="${3}";
+USAGE="Usage: $0 folder [server] [BASE]"
+
+## DIE IF MINIMUM ARGS NOT PASSED
+if [ -z "${FOLDER}" ]; then
+	echo $USAGE;
+	exit 1;
+fi
+
+
+
+echo "### WARNING!  This script runs under a couple of assumptions:";
+echo "###      -- passwordless SSH (using shared keys)";
+echo "###      -- rsync on both ends";
+echo "###      -- PATHS ON BOTH SIDES ARE ***IDENTICAL*** ";
+
+
+
+## SET SOME DEFAULTS
+if [ -z "${2}" ]; then 
+	SVR="kk06"
+fi
+if [ -z "${3}" ]; then
+	BASE="/var/www/html"
+fi
+
+USER=`whoami`
+
+
+echo "###      -- the BASE path is always ${BASE}"
+
+
+MPATH=`echo "${BASE}/${FOLDER}" |  sed 's#/*$##;s#^/*##'`
+MPATH="/${MPATH}/"
+
+CMD="/usr/bin/rsync -ruvtogp --rsh=/usr/bin/ssh ${SVR}:${MPATH} ${MPATH}"
+
+echo "# COMMAND::: ${CMD}"
+
+if [ ! -d "$MPATH" ]; then 
+	echo "FATAL: The folder '${MPATH}' does not exist!";
+	exit 1;
+fi
+
+read -p " ## press [enter] to continue...";
+echo " # ---> HERE I GO!"
+
+/usr/bin/rsync -ruvtogp --rsh=/usr/bin/ssh ${SVR}:${MPATH} ${MPATH}
+
+exit 0;
+
+
+
