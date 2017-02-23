@@ -19,7 +19,16 @@ $GROUP = "kkbold_web";
 
 $IMG = array();
 
-if($_SERVER['USERNAME'] !== 'root') {
+
+$whoIAm = null;
+if(isset($_SERVER['USERNAME'])) {
+	$whoIAm = $_SERVER['USERNAME'];
+}
+elseif(isset($_SERVER['USER'])) {
+	$whoIAm = $_SERVER['USER'];
+}
+
+if($whoIAm !== 'root') {
 	echo "# ---->>> !!!!  WITH GREAT POWER COMES GREAT RESPONSIBILITY\n".
 	"# You must have root access to run this script.\n";
 	echo $USAGE;
