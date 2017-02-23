@@ -122,7 +122,7 @@ $commands = array(
 foreach($IMG as $key=>$imgPath) {
 	$theFile = $imgPath .'/.htaccess';
 	$commands[] = 'echo "php_flag engine off" > '. $theFile;
-	$commands[] = 'chmod u+w '. $theFile .' -R';
+	$commands[] = 'chmod u+w '. $imgPath .' -R';
 }
 	
 echo "# ---->>> !!!!  WITH GREAT POWER COMES GREAT RESPONSIBILITY\n";
