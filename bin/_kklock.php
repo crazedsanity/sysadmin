@@ -14,6 +14,7 @@ $PATH = null;
 echo "\n";
 
 $USAGE = "USAGE: ". $argv[0] ." /path/to/html/site.com/public_html/data [user [group]]\n";
+$USAGE .= "# NOTE: I understand 'public_html' **and** 'wordpress' paths\n";
 $USER = "apache";
 $GROUP = "kkbold_web";
 
@@ -48,9 +49,19 @@ else {
 	 * allow for smart handling of CLI args.  Because this is a smart script.
 	 */
 	
-	if(preg_match('~public_html/~', $argv[1]) == 1) {
+	if(preg_match('~public_html/~', $argv[1]) == 1 || preg_match('~wordpress/~', $argv[1]) == 1) {
 		// smart user!
-		$bits = explode('public_html/', $argv[1]);
+		$separator = 'public_html/';
+		$bits = explode($separator, $argv[1]);
+		if(count($bits) !== 2) {
+			$separator = 'wordpress/';
+			$bits = explode($separator, $argv[1]);
+		}
+		if(count($bits) !== 2) {
+			echo "Fatal: something went wrong, lost my (crazed)sanity\n";
+			echo $USAGE;
+			exit(1);
+		}
 		$folder = trim(preg_replace('~/{2,}~', '', $bits[0]));
 		if(is_dir($folder)) {
 			$PATH = $folder;
@@ -66,7 +77,7 @@ else {
 		$PATH = preg_replace('~/$~', '', $PATH);
 		
 		$myImgFolder = trim($bits[1]);
-		$tryPath = $PATH .'/public_html/'. preg_replace('~/{1,}$~', '', $myImgFolder);
+		$tryPath = $PATH .'/'. $separator . preg_replace('~/{1,}$~', '', $myImgFolder);
 		if(is_dir($tryPath)) {
 			$IMG[] = $tryPath;
 			echo "# NOTE::: added image folder (write access, no php):: ". $tryPath ."\n";
