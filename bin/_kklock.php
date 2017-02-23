@@ -3,7 +3,7 @@
 
 /***
  * script to lock-down KKCMS sites.
- * TODO: stuff.
+ * TODO: make sure there's a rhyme and reason to how things are echo'ed
 #*/
 
 
@@ -13,7 +13,7 @@ $PATH = null;
 //print_r($_SERVER);
 echo "\n";
 
-$USAGE = "USAGE: ". $argv[0] ." /path/to/html/site.com [user [group [writabledir1 [writable dir2]]]]\n";
+$USAGE = "USAGE: ". $argv[0] ." /path/to/html/site.com/public_html/data [user [group]]\n";
 $USER = "apache";
 $GROUP = "kkbold_web";
 
@@ -43,74 +43,66 @@ if(count($argv) < 2) {
 }
 else {
 	
-//	for($i=0; $i <= 11; $i++) {
-	foreach($argv as $i=>$val) {
-		
-		switch($i) {
-			// script name.  Nothing to see here.
-			case 0:
-				break;
-			
-			// folder
-			case 1:
-				$folder = $val;
-				if(is_dir($folder)) {
-					$PATH = $folder;
-				}
-				elseif(is_dir('/var/www/html/'. $folder)) {
-					$PATH = '/var/www/html/'. $folder;
-				}
-				else {
-					echo "Fatal: invalid folder.\n";
-					echo $USAGE;
-					exit(1);
-				}
-				echo "# NOTE::: path is  (". $PATH .")\n";
-				break;
-			
-			// USER
-			case 2:
-				$USER = $argv[$i];
-				break;
-			
-			// GROUP
-			case 3:
-				$GROUP = $argv[$i];
-				break;
-			
-			// writable directories (no PHP access)
-			case 4:
-			case 5:
-			case 6:
-			case 7:
-				$tryPath = $PATH ."/". $argv[$i];
-				if(is_dir($tryPath)) {
-					$IMG[$i] = $tryPath;
-					echo "# NOTE::: added image folder (write access, no php):: ". $tryPath ."\n";
-				}
-				else {
-					echo "Fatal: folder does not exist (". $tryPath .")\n";
-					echo $USAGE;
-					exit(1);
-				}
-				break;
-			
-			default:
-				echo "Fatal: too many arguments (". $i ."). Maybe you need to quote a folder name somewhere?\n";
-				print_r($argv);
-				echo $USAGE;
-				exit(1);
+	
+	/* 
+	 * allow for smart handling of CLI args.  Because this is a smart script.
+	 */
+	
+	if(preg_match('~public_html/~', $argv[1]) == 1) {
+		// smart user!
+		$bits = explode('public_html/', $argv[1]);
+		$folder = trim(preg_replace('~/{2,}~', '', $bits[0]));
+		if(is_dir($folder)) {
+			$PATH = $folder;
 		}
-		
-		if($i >= 11) {
-			echo "# Fatal, too many arguments \n";
+		elseif(is_dir('/var/www/html/'. $folder)) {
+			$PATH = '/var/www/html/'. $folder;
+		}
+		else {
+			echo "Fatal: invalid folder (". $folder .")\n";
 			echo $USAGE;
-			exit;
+			exit(1);
+		}
+		$PATH = preg_replace('~/$~', '', $PATH);
+		
+		$myImgFolder = trim($bits[1]);
+		$tryPath = $PATH .'/public_html/'. preg_replace('~/{1,}$~', '', $myImgFolder);
+		if(is_dir($tryPath)) {
+			$IMG[] = $tryPath;
+			echo "# NOTE::: added image folder (write access, no php):: ". $tryPath ."\n";
+		}
+		else {
+			echo "Fatal (". __LINE__ ."): folder does not exist (". $tryPath .")\n";
+			echo $USAGE;
+			exit(1);
 		}
 	}
-	echo "# NOTE::: user is  (". $USER .")\n";
-	echo "# NOTE::: group is (". $GROUP .")\n";
+	else {
+		// TODO: allow specifying image directory as another argument (somewhere)
+		echo "Fatal: too many options damages my (crazed)sanity\n";
+		echo $USAGE;
+		exit(1);
+//		echo "# not too smart, but whatever.\n";
+//		$folder = trim(preg_replace('~/~', '', $argv[1]));
+	}
+
+	// next argument is the user
+	if(isset($argv[2]) && !empty($argv[2])) {
+		// TODO: test to make sure this looks like a plain old user string...
+		$USER = trim($argv[2]);
+	}
+	
+	// next argument is the group.
+	if(isset($argv[3]) && !empty($argv[3])) {
+		// TODO: test to make sure this looks like a plain old group string...
+		$GROUP = trim($argv[3]);
+	}
+	
 }
+
+
+echo "# NOTE::: user is  (". $USER .")\n";
+echo "# NOTE::: group is (". $GROUP .")\n";
 
 
 
@@ -128,7 +120,7 @@ foreach($IMG as $key=>$imgPath) {
 echo "# ---->>> !!!!  WITH GREAT POWER COMES GREAT RESPONSIBILITY\n";
 echo "# Please review these commands before proceeding :\n";
 print_r($commands);
-
+//exit(99);
 
 
 // Wait for them to respond...
