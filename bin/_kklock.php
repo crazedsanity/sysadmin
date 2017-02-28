@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+
 /***
  * script to lock-down KKCMS sites.
  * TODO: make sure there's a rhyme and reason to how things are echo'ed
@@ -116,7 +117,6 @@ echo "# NOTE::: user is  (". $USER .")\n";
 echo "# NOTE::: group is (". $GROUP .")\n";
 
 
-
 $commands = array(
 	"chown {$USER}:{$GROUP} {$PATH} -R",
 	"find $PATH -type d -exec chmod 570 {} +",
@@ -124,14 +124,23 @@ $commands = array(
 );
 foreach($IMG as $key=>$imgPath) {
 	$theFile = $imgPath .'/.htaccess';
-	$commands[] = 'echo "php_flag engine off" > '. $theFile;
+	
+	// construct a multi-line HTACCESS file.
+	/*
+	<FilesMatch "\.(php|php\.)$">
+	Order Allow,Deny
+	Deny from all
+	</FilesMatch>
+	 */
+	$commands[] = 'echo "php_flag engine off\n<FilesMatch \"\.(php|php\.)\$\">\nOrder Allow,Deny\n</FilesMatch>\n" > '. $theFile;
+	
+	
 	$commands[] = 'chmod u+w '. $imgPath .' -R';
 }
 	
 echo "# ---->>> !!!!  WITH GREAT POWER COMES GREAT RESPONSIBILITY\n";
 echo "# Please review these commands before proceeding :\n";
 print_r($commands);
-//exit(99);
 
 
 // Wait for them to respond...
@@ -141,7 +150,6 @@ $line = fgets($handle);
 if($line == "\n" || trim(strtolower($line)) == 'yes') {
 	echo "### Okay, here we go.  Look for errors.\n\n";
 	
-//	exit(0);
 	foreach($commands as $i=>$cmd) {
 		echo "## command #". $i ."::: ";
 		passthru($cmd);
