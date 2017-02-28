@@ -132,7 +132,7 @@ foreach($IMG as $key=>$imgPath) {
 	Deny from all
 	</FilesMatch>
 	 */
-	$commands[] = 'echo "php_flag engine off\n<FilesMatch \"\.(php|php\.)\$\">\nOrder Allow,Deny\n</FilesMatch>\n" > '. $theFile;
+	$commands[] = 'echo -n "php_flag engine off\n<FilesMatch \"\.(php|php\.)\$\">\nOrder Allow,Deny\n</FilesMatch>\n" > '. $theFile;
 	
 	
 	$commands[] = 'chmod u+w '. $imgPath .' -R';
