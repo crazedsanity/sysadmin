@@ -43,13 +43,17 @@ if(count($argv) < 2) {
 	echo $USAGE;
 	exit(1);
 }
+elseif(empty($argv[1])) {
+	echo "# Invaid path\n";
+	echo $USAGE;
+	exit(1);
+}
 else {
 	
 	
 	/* 
 	 * allow for smart handling of CLI args.  Because this is a smart script.
 	 */
-	
 	if(preg_match('~public_html/~', $argv[1]) == 1 || preg_match('~wordpress/~', $argv[1]) == 1) {
 		// smart user!
 		$separator = 'public_html/';
@@ -90,10 +94,12 @@ else {
 		}
 	}
 	else {
+		echo "# NOTE::: no image folder detected\n";
+		$PATH = preg_replace('~/$~', '', preg_replace('~/{2,}~', '', $argv[1]));
 		// TODO: allow specifying image directory as another argument (somewhere)
-		echo "Fatal: too many options damages my (crazed)sanity\n";
-		echo $USAGE;
-		exit(1);
+//		echo "Fatal: too many options damages my (crazed)sanity\n";
+//		echo $USAGE;
+//		exit(1);
 //		echo "# not too smart, but whatever.\n";
 //		$folder = trim(preg_replace('~/~', '', $argv[1]));
 	}
@@ -116,6 +122,10 @@ else {
 echo "# NOTE::: user is  (". $USER .")\n";
 echo "# NOTE::: group is (". $GROUP .")\n";
 
+if(empty($PATH)) {
+	echo "FATAL: something bad happened, couldn't find a path\n";
+	exit(1);
+}
 
 $commands = array(
 	"chown {$USER}:{$GROUP} {$PATH} -R",
