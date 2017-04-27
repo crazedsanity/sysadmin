@@ -25,6 +25,6 @@ echo " ${CMD}"
 read -p " ## press [enter] to continue...";
 echo " # ---> HERE I GO!"
 
-ssh ${SVR} "mysqldump -u root -R ${DB}" | mysql -u root ${DB}
+ssh ${SVR} "mysqldump -u root -R --skip-definer ${DB}" | mysql -u root ${DB}
 
 echo " # ---> Done."
