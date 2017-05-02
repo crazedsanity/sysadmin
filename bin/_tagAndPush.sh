@@ -5,8 +5,11 @@ if [ ! -r VERSION ]; then
 
 fi;
 
-v=`grep "VERSION:" VERSION | cut -f2 -d " "`
-p=`grep "PROJECT:" VERSION | cut -f2 -d " "`
+xv=`grep "VERSION:" VERSION | cut -f2 -d " "`
+v="$(echo -e "${xv}" | sed -e 's/[[:space:]]*$//')"
+echo "before ${v} after"
+pv=`grep "PROJECT:" VERSION | cut -f2 -d " "`
+p="$(echo -e "${pv}" | sed -e 's/[[:space:]]*$//')"
 #TAG="git tag v$v"
 LASTTAG=`git describe --tags --abbrev=0`
 tmpfile=$(mktemp /tmp/_tagAndPush.XXXXX)
