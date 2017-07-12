@@ -16,6 +16,10 @@ USAGE="Usage: $0 /path/to/wp-install-folder [owner=apache] [group=apache]"
 if [ ! -z "$1" ]; then
 	if [ -d "$1" ]; then
 		WP_ROOT=$1
+		if [ ! -d "$1/wp-includes" ]; then
+			echo "Could not find wp-includes directory ($1/wp-includes)"
+			exit 1;
+		fi
 	else
 		echo "Install directory does not exist ($1)"
 		echo $USAGE
@@ -58,6 +62,17 @@ touch ${WP_ROOT}/.htaccess
 chgrp ${WS_GROUP} ${WP_ROOT}/.htaccess
 chmod 664 ${WP_ROOT}/.htaccess
 
+
+# add .htaccess to disallow PHP scripts from running in the uploads folder
+echo "... creating a secure .htaccess to keep scripts from running in the uploads folder... "
+if [ ! -d "${WP_ROOT}/wp-content/uploads/" ]; then
+	echo "... creating missing uploads folder (${WP_ROOT}/wp-content/uploads/) ..."
+	mkdir ${WP_ROOT}/wp-content/uploads/
+	chown ${WP_OWNER}.${WP_GROUP} ${WP_ROOT}/wp-content/uploads/
+fi
+printf "php_flag engine off\n<FilesMatch \"\.(php|php\.)\$\">\nOrder Allow,Deny\n</FilesMatch>\n" > ${WP_ROOT}/wp-content/uploads/.htaccess
+chmod 444 ${WP_ROOT}/wp-content/uploads/.htaccess
+
 # allow wordpress to manage wp-content
 echo "... allowing wordpress to manage wp-content ..."
 find ${WP_ROOT}/wp-content -exec chgrp ${WS_GROUP} {} \;
@@ -65,5 +80,3 @@ find ${WP_ROOT}/wp-content -type d -exec chmod 775 {} \;
 find ${WP_ROOT}/wp-content -type f -exec chmod 664 {} \;
 
 echo "... DONE!"
-
-
