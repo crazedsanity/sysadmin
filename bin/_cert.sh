@@ -33,6 +33,8 @@ then
 fi
 
 echo "Generating key request for $domain"
+echo "USING SUBJECT: /C=$country/ST=$state/L=$locality/O=$organization/OU=$organizationalunit/CN=$commonname/emailAddress=$email"
+read -p "Press [Enter] to continue, or <CTRL>+c to cancel..."
 
 #Generate a key
 openssl genrsa -des3 -passout pass:$password -out $domain.key 2048 -noout
