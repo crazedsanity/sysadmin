@@ -108,14 +108,16 @@ else {
 	if(isset($argv[2]) && !empty($argv[2])) {
 		// TODO: test to make sure this looks like a plain old user string...
 		$USER = trim($argv[2]);
+		
+		// Set the group to be same as user.
+		if(!isset($argv[3])) {
+			$GROUP = $USER;
+		}
+		else {
+			// next argument is the group.
+			$GROUP = trim($argv[3]);
+		}
 	}
-
-	// next argument is the group.
-	if(isset($argv[3]) && !empty($argv[3])) {
-		// TODO: test to make sure this looks like a plain old group string...
-		$GROUP = trim($argv[3]);
-	}
-
 }
 
 
