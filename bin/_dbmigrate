@@ -2,29 +2,30 @@
 
 DB="$1"
 SVR="$2"
-USAGE="Usage: $0 dbname [server]"
+LOCALDB="$3"
+USAGE="Usage: $0 dbname [server] [local-db-name]"
 if [ -z "$DB" ]; then
 	echo $USAGE;
 	exit 1;
 fi
-#if [ -z "$SVR" ]; then
-#	SVR="server.domain.com"
-#fi;
 if [ -z "$SVR" ]; then
 	echo "servername required (you can edit the script to fix this)";
 	echo $USAGE;
 	exit 1;
 fi;
+if [ -z "$LOCALDB" ]; then
+	LOCALDB="$DB"
+fi;
 
 echo " # ---> IMPORTANT! This script will attempt to create the database locally (ignore errors about that)";
-echo "create schema ${DB}" | mysql -u root
+echo "create schema ${LOCALDB}" | mysql -u root
 
-CMD="ssh ${SVR} \"mysqldump -u root -R ${DB}\" | mysql -u root ${DB}"
+CMD="ssh ${SVR} \"mysqldump -u root -R ${DB}\" | mysql -u root ${LOCALDB}"
 echo " # ---> going to run the following command:";
 echo " ${CMD}"
 read -p " ## press [enter] to continue...";
 echo " # ---> HERE I GO!"
 
-ssh ${SVR} "mysqldump -u root -R ${DB}" | mysql -u root ${DB}
+ssh ${SVR} "mysqldump -u root -R ${DB}" | mysql -u root ${LOCALDB}
 
 echo " # ---> Done."
