@@ -49,9 +49,9 @@ elseif(empty($argv[1])) {
 	exit(1);
 }
 else {
-	
-	
-	/* 
+
+
+	/*
 	 * allow for smart handling of CLI args.  Because this is a smart script.
 	 */
 	if(preg_match('~public_html/~', $argv[1]) == 1 || preg_match('~wordpress/~', $argv[1]) == 1) {
@@ -80,7 +80,7 @@ else {
 			exit(1);
 		}
 		$PATH = preg_replace('~/$~', '', $PATH);
-		
+
 		$myImgFolder = trim($bits[1]);
 		$tryPath = $PATH .'/'. $separator . preg_replace('~/{1,}$~', '', $myImgFolder);
 		if(is_dir($tryPath)) {
@@ -109,13 +109,13 @@ else {
 		// TODO: test to make sure this looks like a plain old user string...
 		$USER = trim($argv[2]);
 	}
-	
+
 	// next argument is the group.
 	if(isset($argv[3]) && !empty($argv[3])) {
 		// TODO: test to make sure this looks like a plain old group string...
 		$GROUP = trim($argv[3]);
 	}
-	
+
 }
 
 
@@ -127,14 +127,20 @@ if(empty($PATH)) {
 	exit(1);
 }
 
+$dirPerms = "775";
+$filePerms = "664";
+if($USER == "apache") {
+	$dirPerms = "570";
+	$filePerms = "460";
+}
 $commands = array(
 	"chown {$USER}:{$GROUP} {$PATH} -R",
-	"find $PATH -type d -exec chmod 570 {} +",
-	"find $PATH -type f -exec chmod 460 {} +",	
+	"find $PATH -type d -exec chmod $dirPerms {} +",
+	"find $PATH -type f -exec chmod $filePerms {} +",
 );
 foreach($IMG as $key=>$imgPath) {
 	$theFile = $imgPath .'/.htaccess';
-	
+
 	// construct a multi-line HTACCESS file.
 	/*
 	<FilesMatch "\.(php|php\.)$">
@@ -143,11 +149,11 @@ foreach($IMG as $key=>$imgPath) {
 	</FilesMatch>
 	 */
 	$commands[] = 'printf "php_flag engine off\n<FilesMatch \"\.(php|php\.)\$\">\nOrder Allow,Deny\n</FilesMatch>\n" > '. $theFile;
-	
-	
+
+
 	$commands[] = 'chmod u+w '. $imgPath .' -R';
 }
-	
+
 echo "# ---->>> !!!!  WITH GREAT POWER COMES GREAT RESPONSIBILITY\n";
 echo "# Please review these commands before proceeding :\n";
 print_r($commands);
@@ -159,7 +165,7 @@ $handle = fopen("php://stdin", "r");
 $line = fgets($handle);
 if($line == "\n" || trim(strtolower($line)) == 'yes') {
 	echo "### Okay, here we go.  Look for errors.\n\n";
-	
+
 	foreach($commands as $i=>$cmd) {
 		echo "## command #". $i ."::: ";
 		passthru($cmd);
@@ -172,5 +178,3 @@ else {
 
 
 exit(0);
-
-
