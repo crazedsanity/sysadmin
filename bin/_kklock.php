@@ -153,7 +153,7 @@ foreach($IMG as $key=>$imgPath) {
 	$commands[] = 'printf "php_flag engine off\n<FilesMatch \"\.(php|php\.)\$\">\nOrder Allow,Deny\n</FilesMatch>\n" > '. $theFile;
 
 
-	$commands[] = 'chmod u+w '. $imgPath .' -R';
+	$commands[] = 'chmod -R u+w '. $imgPath;
 }
 
 echo "# ---->>> !!!!  WITH GREAT POWER COMES GREAT RESPONSIBILITY\n";
