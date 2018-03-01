@@ -18,14 +18,14 @@ if [ -z "$LOCALDB" ]; then
 fi;
 
 echo " # ---> IMPORTANT! This script will attempt to create the database locally (ignore errors about that)";
-echo "create schema ${LOCALDB}" | mysql -u root
+echo "create schema ${LOCALDB}" | mysql
 
-CMD="ssh ${SVR} \"mysqldump -u root -R ${DB}\" | mysql -u root ${LOCALDB}"
+CMD="ssh ${SVR} \"mysqldump -R ${DB}\" | mysql {LOCALDB}"
 echo " # ---> going to run the following command:";
 echo " ${CMD}"
 read -p " ## press [enter] to continue...";
 echo " # ---> HERE I GO!"
 
-ssh ${SVR} "mysqldump -u root -R ${DB}" | mysql -u root ${LOCALDB}
+ssh ${SVR} "mysqldump -R ${DB}" | mysql ${LOCALDB}
 
 echo " # ---> Done."
